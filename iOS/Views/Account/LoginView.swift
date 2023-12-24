@@ -28,81 +28,71 @@ struct LoginView: View {
             Image("Logo")
                 .resizable()
                 .aspectRatio(1, contentMode: .fit)
-                .frame(width: 100)
+                .frame(width: 130)
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding(.bottom, 50)
+                .padding(.bottom, 30)
             
             Text("login.welcome")
                 .font(.headline)
                 .fontDesign(.serif)
             Text("login.text")
                 .font(.subheadline)
-            
-            Button {
-                loginSheetPresented.toggle()
-            } label: {
-                Text("login.promt")
-            }
-            .buttonStyle(LargeButtonStyle())
-            .padding()
-            
-            Spacer()
-            
-            Text("developedBy")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .sheet(isPresented: $loginSheetPresented, content: {
+                .padding(.bottom)
             switch loginFlowState {
             case .server, .credentials:
-                Form {
-                    Section {
-                        if loginFlowState == .server {
-                            TextField("login.server", text: $server)
-                                .keyboardType(.URL)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                        } else if loginFlowState == .credentials {
-                            TextField("login.username", text: $username)
-                            SecureField("login.password", text: $password)
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                        }
+                Section{
+                    if loginFlowState == .server {
+                        TextField("login.server", text: $server)
+                            .keyboardType(.URL)
+                            .textFieldStyle(LoginTextFieldStyle())
                         
                         Button {
                             flowStep()
                         } label: {
                             Text("login.next")
                         }
-                    } header: {
-                        Text("login.title")
-                    } footer: {
-                        Group {
-                            switch loginError {
-                            case .server:
-                                Text("login.error.server")
-                            case .url:
-                                Text("login.error.url")
-                            case .failed:
-                                Text("login.error.failed")
-                            case nil:
-                                Text("")
-                            }
+                        .buttonStyle(LargeButtonStyle())
+                        .padding(3)
+                        Text("Important!")
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .fontDesign(.serif)
+                            .padding(.horizontal, 5)
+                            .bold()
+                            .padding(1)
+                        Text("This app is designed to work with an Audiobookshelf server that you or someone you know is hosting. This app does not provide any content.")
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .font(Font.system(size:15, design: .serif))
+                            .padding(.horizontal, 5)
+                    } else if loginFlowState == .credentials {
+                        TextField("login.username", text: $username)
+                            .textFieldStyle(LoginTextFieldStyle())
+                        SecureField("login.password", text: $password)
+                            .textFieldStyle(LoginTextFieldStyle())
+                        Button {
+                            flowStep()
+                        } label: {
+                            Text("login.promt")
                         }
-                        .foregroundStyle(.red)
+                        .buttonStyle(LargeButtonStyle())
                     }
-                }
-                .onSubmit(flowStep)
-            case .serverLoading, .credentialsLoading:
-                VStack {
-                    ProgressView()
-                    Text("login.loading")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .padding()
-                }
+                }.padding(.horizontal,15)
+                case .serverLoading, .credentialsLoading:
+                    VStack {
+                        ProgressView()
+                        Text("login.loading")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                    }
             }
-        })
+            Spacer()
+            
+            Text("developedBy")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 }
 
